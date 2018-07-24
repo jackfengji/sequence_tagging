@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
 from model.config import Config
@@ -6,6 +8,8 @@ from model.config import Config
 def main():
     # create instance of config
     config = Config()
+
+    print(str(config))
 
     # build model
     model = NERModel(config)

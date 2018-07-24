@@ -1,5 +1,6 @@
+import json
 import os
-
+import inspect
 
 from .general_utils import get_logger
 from .data_utils import get_trimmed_glove_vectors, load_vocab, \
@@ -19,13 +20,14 @@ class Config():
         if not os.path.exists(self.dir_output):
             os.makedirs(self.dir_output)
 
+        self.args = filter(lambda x: not x.startswith('_') and not inspect.ismethod(getattr(self, x)), dir(self))
+
         # create instance of logger
         self.logger = get_logger(self.path_log)
 
         # load if requested (default)
         if load:
             self.load()
-
 
     def load(self):
         """Loads vocabulary, processing functions and embeddings
@@ -54,18 +56,21 @@ class Config():
         self.embeddings = (get_trimmed_glove_vectors(self.filename_trimmed)
                 if self.use_pretrained else None)
 
+    def __str__(self) -> str:
+        return json.dumps(dict([(arg, getattr(self, arg)) for arg in self.args]), indent=2)
 
     # general config
-    dir_output = "results/test/"
+    dir_output = "results/crf-100-0721/"
     dir_model  = dir_output + "model.weights/"
     path_log   = dir_output + "log.txt"
 
     # embeddings
-    dim_word = 300
-    dim_char = 100
+    dim_word = 128
+    dim_char = 128
 
     # glove files
-    filename_glove = "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
+    # filename_glove = "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
+    filename_glove = "data/embedding/embedding_no_combine_with_enhance_2018_07_03_17_33_57.pkl"
     # trimmed embeddings (created from glove_filename with build_data.py)
     filename_trimmed = "data/glove.6B.{}d.trimmed.npz".format(dim_word)
     use_pretrained = True
@@ -74,8 +79,11 @@ class Config():
     # filename_dev = "data/coNLL/eng/eng.testa.iob"
     # filename_test = "data/coNLL/eng/eng.testb.iob"
     # filename_train = "data/coNLL/eng/eng.train.iob"
+    filename_dev = 'data/annotation/dev.txt'
+    filename_test = 'data/annotation/test.txt'
+    filename_train = 'data/annotation/train.txt'
 
-    filename_dev = filename_test = filename_train = "data/test.txt" # test
+    # filename_dev = filename_test = filename_train = "data/test.txt" # test
 
     max_iter = None # if not None, max number of examples in Dataset
 
@@ -86,7 +94,7 @@ class Config():
 
     # training
     train_embeddings = False
-    nepochs          = 15
+    nepochs          = 100
     dropout          = 0.5
     batch_size       = 20
     lr_method        = "adam"
@@ -102,3 +110,10 @@ class Config():
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = True # if crf, training is 1.7x slower on CPU
     use_chars = True # if char embedding, training is 3.5x slower on CPU
+
+    db = {
+        'username': '',
+        'password': '',
+        'host': 'localhost',
+        'db_name': '',
+    }

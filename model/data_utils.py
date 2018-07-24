@@ -1,3 +1,5 @@
+from six.moves import cPickle as pickle
+
 import numpy as np
 import os
 
@@ -71,8 +73,8 @@ class CoNLLDataset(object):
                         yield words, tags
                         words, tags = [], []
                 else:
-                    ls = line.split(' ')
-                    word, tag = ls[0],ls[-1]
+                    ls = line.rsplit(' ', 1)
+                    word, tag = ls[0], ls[-1]
                     if self.processing_word is not None:
                         word = self.processing_word(word)
                     if self.processing_tag is not None:
@@ -140,11 +142,13 @@ def get_glove_vocab(filename):
         vocab: set() of strings
     """
     print("Building vocab...")
-    vocab = set()
-    with open(filename) as f:
-        for line in f:
-            word = line.strip().split(' ')[0]
-            vocab.add(word)
+    with open(filename, 'rb') as f:
+        vocab = set(pickle.load(f).keys())
+    # vocab = set()
+    # with open(filename) as f:
+    #     for line in f:
+    #         word = line.strip().split(' ')[0]
+    #         vocab.add(word)
     print("- done. {} tokens".format(len(vocab)))
     return vocab
 
@@ -205,14 +209,20 @@ def export_trimmed_glove_vectors(vocab, glove_filename, trimmed_filename, dim):
 
     """
     embeddings = np.zeros([len(vocab), dim])
-    with open(glove_filename) as f:
-        for line in f:
-            line = line.strip().split(' ')
-            word = line[0]
-            embedding = [float(x) for x in line[1:]]
-            if word in vocab:
-                word_idx = vocab[word]
-                embeddings[word_idx] = np.asarray(embedding)
+    # with open(glove_filename) as f:
+    #     for line in f:
+    #         line = line.strip().split(' ')
+    #         word = line[0]
+    #         embedding = [float(x) for x in line[1:]]
+    #         if word in vocab:
+    #             word_idx = vocab[word]
+    #             embeddings[word_idx] = np.asarray(embedding)
+    with open(glove_filename, 'rb') as f:
+        e = pickle.load(f)
+
+        for key, arr in e.items():
+            if key in vocab:
+                embeddings[vocab[key]] = arr
 
     np.savez_compressed(trimmed_filename, embeddings=embeddings)
 

@@ -54,7 +54,8 @@ input> I love Paris""")
             # for python 3
             sentence = input("input> ")
 
-        words_raw = sentence.strip().split(" ")
+        # words_raw = sentence.strip().split("")
+        words_raw = sentence.strip()
 
         if words_raw == ["exit"]:
             break

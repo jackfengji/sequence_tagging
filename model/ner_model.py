@@ -16,7 +16,6 @@ class NERModel(BaseModel):
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
 
-
     def add_placeholders(self):
         """Define placeholders = entries to computational graph"""
         # shape = (batch size, max length of sentence in batch)

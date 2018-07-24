@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package cn.malgo.algo;
+
+message Char2IdDict {
+    map<string, int32> charMap = 1;
+}
+
+message LabelId2ClassDict {
+    map<int32, string> labelIdMap = 1;
+}

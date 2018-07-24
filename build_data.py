@@ -2,6 +2,7 @@ from model.config import Config
 from model.data_utils import CoNLLDataset, get_vocabs, UNK, NUM, \
     get_glove_vocab, write_vocab, load_vocab, get_char_vocab, \
     export_trimmed_glove_vectors, get_processing_word
+from model.db import prepare_data
 
 
 def main():
@@ -22,6 +23,8 @@ def main():
     # get config and processing of words
     config = Config(load=False)
     processing_word = get_processing_word(lowercase=True)
+
+    prepare_data(config)
 
     # Generators
     dev   = CoNLLDataset(config.filename_dev, processing_word)
